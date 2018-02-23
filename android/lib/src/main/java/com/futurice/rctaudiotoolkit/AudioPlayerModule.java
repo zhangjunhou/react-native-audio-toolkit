@@ -61,21 +61,26 @@ public class AudioPlayerModule extends ReactContextBaseJavaModule implements Med
 
     @Override
     public void onHostPause() {
-        for (Map.Entry<Integer, MediaPlayer> entry : this.playerPool.entrySet()) {
-            Integer playerId = entry.getKey();
+        try {
+            for (Map.Entry<Integer, MediaPlayer> entry : this.playerPool.entrySet()) {
+                Integer playerId = entry.getKey();
 
-            if (!this.playerContinueInBackground.get(playerId)) {
-                MediaPlayer player = entry.getValue();
-                player.pause();
+                if (!this.playerContinueInBackground.get(playerId)) {
+                    MediaPlayer player = entry.getValue();
+                    player.pause();
 
-                WritableMap info = getInfo(player);
+                    WritableMap info = getInfo(player);
 
-                WritableMap data = new WritableNativeMap();
-                data.putString("message", "Playback paused due to onHostPause");
-                data.putMap("info", info);
+                    WritableMap data = new WritableNativeMap();
+                    data.putString("message", "Playback paused due to onHostPause");
+                    data.putMap("info", info);
 
-                emitEvent(playerId, "pause", data);
+                    emitEvent(playerId, "pause", data);
+                }
             }
+        }catch (Exception e) {
+            Log.d(LOG_TAG, e.toString());
+            return;
         }
     }
 
